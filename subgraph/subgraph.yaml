@@ -1,0 +1,82 @@
+specVersion: 0.0.2
+description: TheXdaoNFT subgraph data on Binance.
+repository: 
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TheXdaoMarket # Market Contract
+    network: fantom
+    source:
+      address: '0x31c5cc4936b875b5211afa256b7fc0572b038726'
+      abi: TheXdaoMarket
+      startBlock: 25500297
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/TheXdaoMarket.ts
+      entities:
+        - Collection
+        - Pair        
+      abis:
+        - name: TheXdaoMarket
+          file: ./abis/TheXdaoMarket.json
+      eventHandlers:
+        - event: CollectionCreated(address,address,string,string,bool)
+          handler: handleCollectionCreated 
+        - event: ItemListed(uint256,address,uint256,uint256,address,address,uint256)
+          handler: handleItemListed 
+        - event: ItemDelisted(uint256)
+          handler: handleItemDelisted 
+        - event: Swapped(address,(uint256,address,uint256,address,address,uint256,uint256,bool))
+          handler: handleSwapped
+  - kind: ethereum/contract
+    name: TheXdaoAuction #Auction Contract
+    network: fantom
+    source:
+      address: '0x42422b0c9a007fdf3104b39dfe13cd6fc429a208'
+      abi: TheXdaoAuction
+      startBlock: 25500655
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/TheXdaoAuction.ts
+      entities:
+        - Auction
+        - Bid
+      abis:
+        - name: TheXdaoAuction
+          file: ./abis/TheXdaoAuction.json
+      eventHandlers:
+        - event: BidSuccess(address,uint256,uint256,uint256)
+          handler: handleBidSuccess 
+        - event: AuctionCreated((uint256,address,uint256,uint256,uint256,uint256,address,address,bool))
+          handler: handleAuctionCreated 
+        - event: AuctionCanceled(uint256)
+          handler: handleAuctionCanceled 
+        - event: AuctionFinalized(address,uint256,(uint256,address,uint256,uint256,uint256,uint256,address,address,bool))
+          handler: handleAuctionFinalized        
+templates:
+  - kind: ethereum/contract
+    name: TheXdaoNFT # NFT contract 
+    network: fantom
+    source:
+      abi: TheXdaoNFT      
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/TheXdaoNFT.ts
+      entities:
+        - Item
+      abis:
+        - name: TheXdaoNFT
+          file: ./abis/TheXdaoNFT.json
+      eventHandlers:
+        - event: ItemCreated(uint256,address,string,uint256)
+          handler: handleItemCreated        
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        
